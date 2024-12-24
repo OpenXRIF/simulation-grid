@@ -1,6 +1,7 @@
 from src.grid.node import GridNode
 
-class Grid():
+
+class Grid:
     def __init__(
         self,
         rows: int = 30,
@@ -14,25 +15,21 @@ class Grid():
 
     def get_node(self, x: int, y: int) -> GridNode:
         return self.grid[x][y]
-    
+
     def set_node(self, x: int, y: int, node: GridNode):
         self.grid[x][y] = node
-    
+
     def __str__(self):
-        return "\n".join(
-            [
-                " ".join([str(cell) for cell in row])
-                for row in self.grid
-            ]
-        )
+        return "\n".join([" ".join([str(cell) for cell in row]) for row in self.grid])
+
 
 class TemplatedGrid(Grid):
     def __init__(self, template: str):
         """
-        Create a grid from a template. Requires a template string where 
+        Create a grid from a template. Requires a template string where
         each character represents a node type.
 
-        Guidelines: 
+        Guidelines:
         - Newlines separate rows.
         - Each character represents a node type.
         - Characters can be any of the following:
