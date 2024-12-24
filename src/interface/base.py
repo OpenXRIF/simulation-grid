@@ -46,8 +46,6 @@ class Node(object):
         self.hCost = math.sqrt((endX - self.x) ** 2 + (endY - self.y) ** 2) * 10
         self.fCost = self.gCost + self.hCost
 
-# Variables
-run = True # PyGame Loop Run Boolean.
 algorithm = False # When the user presses SPACE to start the algorithm.
 pathFound = False # When the Final Node has been found.
 leftDrag = False # Detecting Left-click mouse drag to set barrier nodes.
@@ -117,7 +115,12 @@ def findPath():
             break
 
 def game_loop():
-    global run, algorithm, openNodes, closedNodes, path, pathFound, startX, startY, endX, endY, leftDrag, rightDrag
+    """Main game loop for the simulation."""
+    global algorithm, openNodes, closedNodes, path, pathFound, startX, startY, endX, endY, leftDrag, rightDrag
+    run = True
+
+    print("-------- Simulation Started --------")
+
     while run:
         # Event Detection
         for event in pygame.event.get():
@@ -127,7 +130,7 @@ def game_loop():
                 if event.key == pygame.K_SPACE: # Press "SPACE" key to start the Algorithm.
                     if not algorithm:
                         algorithm = True
-                        print("-------- Simulation Started --------")
+                        print("-------- Simulation Running --------")
                 elif event.key == pygame.K_ESCAPE: # Press "ESC" key to stop the Algorithm.
                     run = False
                 elif event.key == pygame.K_1:
@@ -162,7 +165,7 @@ def game_loop():
                     removeBarrier(mouseX, mouseY)
 
         drawGrid()
-        
+
         if algorithm and not pathFound:
             try:
                 # Find the Current Node (Open Node with smallest fcost).
@@ -197,5 +200,6 @@ def game_loop():
         pygame.display.update()
 
     if not run:
+        print("-------- Simulation Finished --------")
         pygame.quit()
         sysExit()
