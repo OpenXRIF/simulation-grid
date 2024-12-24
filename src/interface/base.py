@@ -1,13 +1,7 @@
-import pygame
-from sys import exit as sysExit
+import sys
 import math
 
-pygame.init()
-winX, winY = 600, 400
-SCREEN = pygame.display.set_mode((winX, winY))
-CLOCK = pygame.time.Clock()
-SCREEN.fill((0, 0, 0))
-pygame.display.set_caption("BrainFlight Simulation Grid")
+import pygame
 
 # Colours
 BLACK = (0, 0, 0)  # Walkable Nodes
@@ -17,8 +11,17 @@ BLUE = (75, 66, 245)  # Start and End Nodes
 RED = (245, 102, 66)  # Closed Nodes
 GREEN = (87, 245, 66)  # Open Nodes
 
+# Window Dimensions
+WINDOW_WIDTH = 600
+WINDOW_HEIGHT = 400
 
-# Classes
+pygame.init()
+screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+clock = pygame.time.Clock()
+screen.fill((0, 0, 0))
+pygame.display.set_caption("BrainFlight Simulation Grid")
+
+
 class Node(object):
     def __init__(self, x, y, walkable=True):
         self.x = x
@@ -30,106 +33,109 @@ class Node(object):
         self.previousNode = None
 
     def setSurrounding(self, b):
-        global grid, closedNodes
+        global grid, closed_nodes
         x, y = self.x, self.y
-        if x > 0 and grid[x - 1][y].walkable and [x - 1, y] not in closedNodes:
+        if x > 0 and grid[x - 1][y].walkable and [x - 1, y] not in closed_nodes:
             b.append([x - 1, y])
         if (
             x < len(grid) - 1
             and grid[x + 1][y].walkable
-            and [x + 1, y] not in closedNodes
+            and [x + 1, y] not in closed_nodes
         ):
             b.append([x + 1, y])
-        if y > 0 and grid[x][y - 1].walkable and [x, y - 1] not in closedNodes:
+        if y > 0 and grid[x][y - 1].walkable and [x, y - 1] not in closed_nodes:
             b.append([x, y - 1])
         if (
             y < len(grid[0]) - 1
             and grid[x][y + 1].walkable
-            and [x, y + 1] not in closedNodes
+            and [x, y + 1] not in closed_nodes
         ):
             b.append([x, y + 1])
 
     def setCost(self):
-        global endX, endY, startX, startY
-        self.gCost = math.sqrt((self.x - startX) ** 2 + (self.y - startY) ** 2) * 10
-        self.hCost = math.sqrt((endX - self.x) ** 2 + (endY - self.y) ** 2) * 10
-        self.fCost = self.gCost + self.hCost
+        global end_x, end_y, start_x, start_y
+        self.g_cost = math.sqrt((self.x - start_x) ** 2 + (self.y - start_y) ** 2) * 10
+        self.h_cost = math.sqrt((end_x - self.x) ** 2 + (end_y - self.y) ** 2) * 10
+        self.f_cost = self.g_cost + self.h_cost
 
 
 algorithm = False  # When the user presses SPACE to start the algorithm.
-pathFound = False  # When the Final Node has been found.
-leftDrag = False  # Detecting Left-click mouse drag to set barrier nodes.
-rightDrag = False  # Detecting Right-click mouse drag to remove barrier nodes.
-nodeSize = 20  # Pixel side-length of each node.
-grid = [[Node(x, y) for y in range(winY // nodeSize)] for x in range(winX // nodeSize)]
-startX, startY = 4, 5
-endX, endY = 24, 17
-openNodes = [[startX, startY]]
-closedNodes = []
+path_found = False  # When the Final Node has been found.
+left_drag = False  # Detecting Left-click mouse drag to set barrier nodes.
+right_drag = False  # Detecting Right-click mouse drag to remove barrier nodes.
+node_size = 20  # Pixel side-length of each node.
+grid = [
+    [Node(x, y) for y in range(WINDOW_HEIGHT // node_size)]
+    for x in range(WINDOW_WIDTH // node_size)
+]
+start_x, start_y = 4, 5
+end_x, end_y = 24, 17
+openNodes = [[start_x, start_y]]
+closed_nodes = []
 path = []
 
 
 def setBarrier(x, y):
-    global nodeSize, grid, algorithm, startX, startY, endX, endY
-    if not algorithm and not pathFound and x < winX and y < winY:
-        x = x // nodeSize
-        y = y // nodeSize
-        if x == startX and y == startY:
+    global node_size, grid, algorithm, start_x, start_y, end_x, end_y
+    if not algorithm and not path_found and x < WINDOW_WIDTH and y < WINDOW_HEIGHT:
+        x = x // node_size
+        y = y // node_size
+        if x == start_x and y == start_y:
             grid[x][y].walkable = True
         else:
-            if x == endX and y == endY:
+            if x == end_x and y == end_y:
                 grid[x][y].walkable = True
             else:
                 grid[x][y].walkable = False
 
 
 def removeBarrier(x, y):
-    global nodeSize, grid, algorithm
-    if not algorithm and not pathFound and x < winX and y < winY:
-        x = x // nodeSize
-        y = y // nodeSize
+    global node_size, grid, algorithm
+    if not algorithm and not path_found and x < WINDOW_WIDTH and y < WINDOW_HEIGHT:
+        x = x // node_size
+        y = y // node_size
         if not grid[x][y].walkable:
             grid[x][y].walkable = True
 
 
 def drawGrid():
-    global nodeSize, grid, openNodes, closedNodes, startX, startY, endX, endY
+    global node_size, grid, openNodes, closed_nodes, start_x, start_y, end_x, end_y
     for n in grid:
         for Node in n:
             if Node.walkable:
                 rect = pygame.Rect(
-                    Node.x * nodeSize, Node.y * nodeSize, nodeSize, nodeSize
+                    Node.x * node_size, Node.y * node_size, node_size, node_size
                 )
-                pygame.draw.rect(SCREEN, BLACK, rect, 0)
+                pygame.draw.rect(screen, BLACK, rect, 0)
             else:
                 rect = pygame.Rect(
-                    Node.x * nodeSize, Node.y * nodeSize, nodeSize, nodeSize
+                    Node.x * node_size, Node.y * node_size, node_size, node_size
                 )
-                pygame.draw.rect(SCREEN, WHITE, rect, 0)
-    for z in closedNodes:
-        rect = pygame.Rect(z[0] * nodeSize, z[1] * nodeSize, nodeSize, nodeSize)
-        pygame.draw.rect(SCREEN, RED, rect, 0)
+                pygame.draw.rect(screen, WHITE, rect, 0)
+    for z in closed_nodes:
+        rect = pygame.Rect(z[0] * node_size, z[1] * node_size, node_size, node_size)
+        pygame.draw.rect(screen, RED, rect, 0)
     for k in openNodes:
-        rect = pygame.Rect(k[0] * nodeSize, k[1] * nodeSize, nodeSize, nodeSize)
-        pygame.draw.rect(SCREEN, GREEN, rect, 0)
+        rect = pygame.Rect(k[0] * node_size, k[1] * node_size, node_size, node_size)
+        pygame.draw.rect(screen, GREEN, rect, 0)
     for x in path:
-        rect = pygame.Rect(x[0] * nodeSize, x[1] * nodeSize, nodeSize, nodeSize)
-        pygame.draw.rect(SCREEN, YELLOW, rect, 0)
-    rect = pygame.Rect(startX * nodeSize, startY * nodeSize, nodeSize, nodeSize)
-    pygame.draw.rect(SCREEN, BLUE, rect, 0)
-    rect = pygame.Rect(endX * nodeSize, endY * nodeSize, nodeSize, nodeSize)
-    pygame.draw.rect(SCREEN, BLUE, rect, 0)
+        rect = pygame.Rect(x[0] * node_size, x[1] * node_size, node_size, node_size)
+        pygame.draw.rect(screen, YELLOW, rect, 0)
+    rect = pygame.Rect(start_x * node_size, start_y * node_size, node_size, node_size)
+    pygame.draw.rect(screen, BLUE, rect, 0)
+    rect = pygame.Rect(end_x * node_size, end_y * node_size, node_size, node_size)
+    pygame.draw.rect(screen, BLUE, rect, 0)
 
 
 def findPath():
-    global startX, startY, endX, endY, grid
-    currentX, currentY = endX, endY
+    global start_x, start_y, end_x, end_y, grid
+    currentX, currentY = end_x, end_y
     while True:
         previousNode = grid[currentX][currentY].previousNode
         previousX, previousY = previousNode.x, previousNode.y
         path.append([previousX, previousY])
         currentX, currentY = previousX, previousY
-        if currentX == startX and currentY == startY:
+        if currentX == start_x and currentY == start_y:
             break
 
 
@@ -138,15 +144,15 @@ def game_loop():
     global \
         algorithm, \
         openNodes, \
-        closedNodes, \
+        closed_nodes, \
         path, \
-        pathFound, \
-        startX, \
-        startY, \
-        endX, \
-        endY, \
-        leftDrag, \
-        rightDrag
+        path_found, \
+        start_x, \
+        start_y, \
+        end_x, \
+        end_y, \
+        left_drag, \
+        right_drag
     run = True
 
     print("-------- Simulation Started --------")
@@ -169,64 +175,64 @@ def game_loop():
                     run = False
                 elif event.key == pygame.K_1:
                     if not algorithm:
-                        startX, startY = (
-                            pygame.mouse.get_pos()[0] // nodeSize,
-                            pygame.mouse.get_pos()[1] // nodeSize,
+                        start_x, start_y = (
+                            pygame.mouse.get_pos()[0] // node_size,
+                            pygame.mouse.get_pos()[1] // node_size,
                         )
-                        openNodes = [[startX, startY]]
-                        grid[startX][startY].walkable = True
+                        openNodes = [[start_x, start_y]]
+                        grid[start_x][start_y].walkable = True
                 elif event.key == pygame.K_2:
                     if not algorithm:
-                        endX, endY = (
-                            pygame.mouse.get_pos()[0] // nodeSize,
-                            pygame.mouse.get_pos()[1] // nodeSize,
+                        end_x, end_y = (
+                            pygame.mouse.get_pos()[0] // node_size,
+                            pygame.mouse.get_pos()[1] // node_size,
                         )
-                        grid[endX][endY].walkable = True
+                        grid[end_x][end_y].walkable = True
             elif (
                 event.type == pygame.MOUSEBUTTONDOWN
             ):  # Drag mouse while holding left click to add barriers.
                 if event.button == 1:
-                    leftDrag = True
+                    left_drag = True
                     mouseX, mouseY = event.pos
                     setBarrier(mouseX, mouseY)
                 if event.button == 3:
-                    rightDrag = True
+                    right_drag = True
                     mouseX, mouseY = event.pos
                     removeBarrier(mouseX, mouseY)
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
-                    leftDrag = False
+                    left_drag = False
                 if event.button == 3:
-                    rightDrag = False
+                    right_drag = False
             elif event.type == pygame.MOUSEMOTION:
-                if leftDrag:
+                if left_drag:
                     mouseX, mouseY = event.pos
                     setBarrier(mouseX, mouseY)
-                elif rightDrag:
+                elif right_drag:
                     mouseX, mouseY = event.pos
                     removeBarrier(mouseX, mouseY)
 
         drawGrid()
 
-        if algorithm and not pathFound:
+        if algorithm and not path_found:
             try:
                 # Find the Current Node (Open Node with smallest fcost).
                 current = openNodes[0]
                 for i in openNodes:
-                    if i != [startX, startY]:
+                    if i != [start_x, start_y]:
                         grid[i[0]][i[1]].setCost()
                     if grid[i[0]][i[1]].fcost < grid[current[0]][current[1]].fcost:
                         current = i
 
                 # Add Current Node to Closed Nodes.
-                closedNodes.append(current)
+                closed_nodes.append(current)
                 del openNodes[openNodes.index(current)]
                 # print(current)
 
                 # End Node found.
-                if current == [endX, endY] or [endX, endY] in closedNodes:
+                if current == [end_x, end_y] or [end_x, end_y] in closed_nodes:
                     findPath()
-                    pathFound = True
+                    path_found = True
 
                 # Add Neighbours to Open Nodes.
                 neighbours = []
@@ -244,4 +250,4 @@ def game_loop():
     if not run:
         print("-------- Simulation Finished --------")
         pygame.quit()
-        sysExit()
+        sys.exit()
