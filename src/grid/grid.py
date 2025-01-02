@@ -6,11 +6,9 @@ class Grid:
         self,
         rows: int = 30,
         cols: int = 20,
-        cell_size: int = 20,
     ):
         self.rows = rows
         self.cols = cols
-        self.cell_size = cell_size
         self.grid = [[GridNode() for _ in range(cols)] for _ in range(rows)]
 
     def get_node(self, x: int, y: int) -> GridNode:
@@ -20,7 +18,15 @@ class Grid:
         self.grid[x][y] = node
 
     def __str__(self):
-        return "\n".join([" ".join([str(cell) for cell in row]) for row in self.grid])
+        return "\n".join([" ".join([str(node) for node in row]) for row in self.grid])
+
+    def __getitem__(self, index):
+        return self.grid[index]
+
+    def __iter__(self):
+        for row in self.grid:
+            for node in row:
+                yield node
 
 
 class TemplatedGrid(Grid):
