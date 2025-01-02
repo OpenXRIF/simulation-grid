@@ -25,7 +25,7 @@ class Grid:
 
 class TemplatedGrid(Grid):
     def __init__(self, template: str):
-        """
+        """NOTE:
         Create a grid from a template. Requires a template string where
         each character represents a node type.
 
