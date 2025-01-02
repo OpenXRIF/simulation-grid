@@ -200,7 +200,7 @@ def game_loop():
                     if i not in openNodes:
                         openNodes.append(i)
 
-                pygame.time.delay(5)
+                pygame.time.delay(10)
             except Exception as e:
                 print(f"Error: {e}")
         pygame.display.update()
