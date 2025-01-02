@@ -106,3 +106,6 @@ cython_debug/
 
 .pypirc
 .ruff_cache/
+
+tmp/
+tmp*
