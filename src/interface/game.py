@@ -98,9 +98,8 @@ class GameInterface:
                             pygame.mouse.get_pos()[1] // self.node_size,
                         )
                         self.grid[self.start[0]][self.start[1]].walkable = True
-                elif (
-                    event.type == pygame.MOUSEBUTTONDOWN
-                ):  # NOTE: Drag mouse while holding left click to add barriers.
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    # NOTE: Drag mouse while holding left click to add barriers.
                     if event.button == 1:
                         left_drag = True
                         mouse_x, mouse_y = event.pos

@@ -2,7 +2,7 @@ from src.interface.game import GameInterface
 from src.constants import WELCOME_ASCII
 from src.grid.grid import Grid
 
-# TODO: Implement text/cli interface (no PyGame)
+# cohere_client = cohere.ClientV2(api_key=os.getenv("COHERE_API_KEY"))
 
 goal_queue = [
     {
