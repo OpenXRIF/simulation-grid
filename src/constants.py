@@ -17,5 +17,5 @@ WELCOME_ASCII = r"""
  \__  T |  | |  \_/  ||     ||  T  ||    /  |  | |  D  Y
  /  \ | |  | |   |   |l_____j|  l_ ||    \  |  | |     |
  \    | j  l |   |   |       |     ||  .  Y j  l |     |
-  \___j|____jl___j___j       l___,_jl__j\_j|____jl_____j     BrainFlight - 2025
+  \___j|____jl___j___j       l___,_jl__j\_j|____jl_____j     OpenXRIF - 2025
 """
