@@ -72,7 +72,7 @@ class GameInterface:
     def run(self):
         """Main game loop for the simulation."""
         self.screen.fill((0, 0, 0))
-        pygame.display.set_caption("BrainFlight Simulation Grid")
+        pygame.display.set_caption("XRIF Simulation Grid")
 
         left_drag = False  # Detecting Left-click mouse drag to set barrier nodes.
         right_drag = False  # Detecting Right-click mouse drag to remove barrier nodes.
